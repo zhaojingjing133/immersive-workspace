@@ -1,0 +1,58 @@
+import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { WorkspaceSize } from '../utils/constants';
+
+export type WorkspaceMode = 'text' | 'pdf';
+
+interface WorkspaceContextType {
+  size: WorkspaceSize;
+  setSize: (size: WorkspaceSize) => void;
+  content: string;
+  setContent: (content: string) => void;
+  title: string;
+  setTitle: (title: string) => void;
+  mode: WorkspaceMode;
+  setMode: (mode: WorkspaceMode) => void;
+  pdfFile: File | null;
+  setPdfFile: (file: File | null) => void;
+}
+
+const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
+
+export const useWorkspace = () => {
+  const context = useContext(WorkspaceContext);
+  if (!context) {
+    throw new Error('useWorkspace must be used within WorkspaceProvider');
+  }
+  return context;
+};
+
+interface WorkspaceProviderProps {
+  children: ReactNode;
+}
+
+export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }) => {
+  const [size, setSize] = useState<WorkspaceSize>(WorkspaceSize.SMALL);
+  const [content, setContent] = useState<string>('');
+  const [title, setTitle] = useState<string>('标题');
+  const [mode, setMode] = useState<WorkspaceMode>('text');
+  const [pdfFile, setPdfFile] = useState<File | null>(null);
+
+  return (
+    <WorkspaceContext.Provider
+      value={{
+        size,
+        setSize,
+        content,
+        setContent,
+        title,
+        setTitle,
+        mode,
+        setMode,
+        pdfFile,
+        setPdfFile,
+      }}
+    >
+      {children}
+    </WorkspaceContext.Provider>
+  );
+};
