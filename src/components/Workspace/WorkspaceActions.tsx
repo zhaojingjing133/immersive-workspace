@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Box, IconButton, Stack } from '@mui/material';
-import { CloudUpload, CloudDownload, Delete } from '@mui/icons-material';
+import { CloudUpload, CloudDownload, Delete, ZoomIn, ZoomOut } from '@mui/icons-material';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { WorkspaceSize } from '../../utils/constants';
 import { isValidPDFFile, exportTextToPDF } from '../../utils/fileHandlers';
@@ -8,7 +8,7 @@ import ConfirmDialog from '../Common/ConfirmDialog';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const WorkspaceActions: React.FC = () => {
-  const { mode, pdfFile, setPdfFile, setMode, content, setContent, title, size } = useWorkspace();
+  const { mode, pdfFile, setPdfFile, setMode, content, setContent, title, size, pdfScale, setPdfScale } = useWorkspace();
   const t = useTranslation();
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -117,24 +117,13 @@ const WorkspaceActions: React.FC = () => {
   const isDownloadDisabled = !hasInteracted || (mode === 'text' && !content) || (mode === 'pdf' && !pdfFile);
   const isDeleteDisabled = (mode === 'text' && !content) || (mode === 'pdf' && !pdfFile);
 
-  // 在PDF模式下不显示操作按钮（已在PDFViewer中显示）
-  if (mode === 'pdf') {
-    return (
-      <>
-        <ConfirmDialog
-          open={confirmDialog.open}
-          title={confirmDialog.title}
-          message={confirmDialog.message}
-          onConfirm={() => {
-            confirmDialog.onConfirm();
-          }}
-          onCancel={() => {
-            setConfirmDialog({ ...confirmDialog, open: false });
-          }}
-        />
-      </>
-    );
-  }
+  const zoomIn = () => {
+    setPdfScale(Math.min(2.0, pdfScale + 0.2));
+  };
+
+  const zoomOut = () => {
+    setPdfScale(Math.max(0.5, pdfScale - 0.2));
+  };
 
   return (
     <>
@@ -154,14 +143,45 @@ const WorkspaceActions: React.FC = () => {
           display: 'flex',
           justifyContent: 'flex-end',
           alignItems: 'center',
-          backgroundColor: 'transparent', // 确保没有背景
+          backgroundColor: mode === 'pdf' ? 'rgba(34, 34, 34, 0.9)' : 'transparent',
+          backdropFilter: mode === 'pdf' ? 'blur(10px)' : 'none',
         }}
       >
         <Stack 
           direction="row" 
-          spacing={1}
-          sx={{ gap: '8px' }}
+          spacing={size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? 0.5 : 1}
+          sx={{ gap: mode === 'pdf' ? (size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '4px' : '8px') : '8px' }}
+          alignItems="center"
         >
+          {/* PDF模式下的缩放按钮 */}
+          {mode === 'pdf' && (
+            <>
+              <IconButton
+                onClick={zoomOut}
+                sx={{
+                  color: '#ffffff',
+                  padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                <ZoomOut />
+              </IconButton>
+              <IconButton
+                onClick={zoomIn}
+                sx={{
+                  color: '#ffffff',
+                  padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
+                  '&:hover': {
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                  },
+                }}
+              >
+                <ZoomIn />
+              </IconButton>
+            </>
+          )}
           <IconButton
             onClick={handleUploadClick}
             sx={{

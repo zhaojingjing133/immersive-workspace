@@ -100,7 +100,7 @@ const WorkspaceEditor: React.FC = () => {
             sx={{
               fontWeight: 500,
               fontSize: '12px',
-              color: '#a1a1aa',
+              color: '#ffffff',
               marginLeft: '16px',
             }}
           >

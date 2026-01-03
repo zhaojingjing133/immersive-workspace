@@ -17,6 +17,8 @@ interface WorkspaceContextType {
   setMode: (mode: WorkspaceMode) => void;
   pdfFile: File | null;
   setPdfFile: (file: File | null) => void;
+  pdfScale: number;
+  setPdfScale: (scale: number) => void;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextType | undefined>(undefined);
@@ -40,6 +42,7 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
   const [title, setTitle] = useState<string>('标题');
   const [mode, setMode] = useState<WorkspaceMode>('text');
   const [pdfFile, setPdfFile] = useState<File | null>(null);
+  const [pdfScale, setPdfScale] = useState<number>(1.0);
 
   return (
     <WorkspaceContext.Provider
@@ -56,6 +59,8 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
         setMode,
         pdfFile,
         setPdfFile,
+        pdfScale,
+        setPdfScale,
       }}
     >
       {children}
