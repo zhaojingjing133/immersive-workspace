@@ -44,100 +44,112 @@ const WorkspaceEditor: React.FC = () => {
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        padding: { xs: '24px', sm: '32px 40px' },
+        position: 'relative',
       }}
     >
-      {/* Header */}
+      {/* Content Area - Scrollable (same as PDF) */}
       <Box
         sx={{
+          flex: 1,
+          overflow: 'auto',
+          padding: '24px',
+          paddingBottom: '24px',
           display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '24px',
+          flexDirection: 'column',
         }}
       >
+        {/* Header - Now scrollable with content */}
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '24px',
+          }}
+        >
+          <TextField
+            value={title}
+            onChange={handleTitleChange}
+            variant="standard"
+            InputProps={{
+              disableUnderline: true,
+              sx: {
+                color: '#ffffff',
+                fontWeight: 600,
+                fontSize: { xs: '20px', sm: '24px' },
+                '& input': {
+                  padding: 0,
+                  textAlign: 'left',
+                },
+              },
+            }}
+            sx={{
+              flex: 1,
+              '& .MuiInputBase-root': {
+                '&:before': {
+                  display: 'none',
+                },
+                '&:after': {
+                  display: 'none',
+                },
+              },
+            }}
+          />
+          <Typography
+            variant="body2"
+            sx={{
+              fontWeight: 500,
+              fontSize: '12px',
+              color: '#a1a1aa',
+              marginLeft: '16px',
+            }}
+          >
+            {currentDate}
+          </Typography>
+        </Box>
+
+        {/* Divider - Now scrollable with content */}
+        <Divider
+          sx={{
+            marginBottom: '24px',
+            borderColor: 'rgba(255, 255, 255, 0.2)',
+          }}
+        />
+
+        {/* Content */}
         <TextField
-          value={title}
-          onChange={handleTitleChange}
+          multiline
+          fullWidth
+          value={content}
+          onChange={handleContentChange}
+          placeholder="请输入"
           variant="standard"
           InputProps={{
             disableUnderline: true,
             sx: {
               color: '#ffffff',
-              fontWeight: 600,
-              fontSize: { xs: '20px', sm: '24px' },
-              '& input': {
-                padding: 0,
-                textAlign: 'left',
+              fontSize: { xs: '14px', sm: '16px' },
+              lineHeight: '1.625em',
+              letterSpacing: '0.1em',
+              minHeight: '100%',
+              '& textarea': {
+                overflow: 'visible',
+                minHeight: '100%',
               },
             },
           }}
           sx={{
             flex: 1,
             '& .MuiInputBase-root': {
-              '&:before': {
-                display: 'none',
-              },
-              '&:after': {
-                display: 'none',
-              },
+              height: 'auto',
+              minHeight: '100%',
+            },
+            '& .MuiInputBase-input': {
+              minHeight: '100%',
             },
           }}
         />
-        <Typography
-          variant="body2"
-          sx={{
-            fontWeight: 500,
-            fontSize: '12px',
-            color: '#a1a1aa',
-            marginLeft: '16px',
-          }}
-        >
-          {currentDate}
-        </Typography>
       </Box>
-
-      {/* Divider */}
-      <Divider
-        sx={{
-          marginBottom: '24px',
-          borderColor: 'rgba(255, 255, 255, 0.2)',
-        }}
-      />
-
-      {/* Editor */}
-      <TextField
-        multiline
-        fullWidth
-        value={content}
-        onChange={handleContentChange}
-        placeholder="请输入"
-        variant="standard"
-        InputProps={{
-          disableUnderline: true,
-          sx: {
-            color: '#ffffff',
-            fontSize: { xs: '14px', sm: '16px' },
-            lineHeight: '1.625em',
-            letterSpacing: '0.1em',
-            height: '100%',
-            '& textarea': {
-              overflow: 'auto',
-              height: '100% !important',
-            },
-          },
-        }}
-        sx={{
-          flex: 1,
-          '& .MuiInputBase-root': {
-            height: '100%',
-          },
-          '& .MuiInputBase-input': {
-            height: '100%',
-            overflow: 'auto',
-          },
-        }}
-      />
     </Box>
   );
 };

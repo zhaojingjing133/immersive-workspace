@@ -2,12 +2,13 @@ import React, { useState, useRef } from 'react';
 import { Box, IconButton, Stack } from '@mui/material';
 import { CloudUpload, CloudDownload, Delete } from '@mui/icons-material';
 import { useWorkspace } from '../../context/WorkspaceContext';
+import { WorkspaceSize } from '../../utils/constants';
 import { isValidPDFFile, exportTextToPDF } from '../../utils/fileHandlers';
 import ConfirmDialog from '../Common/ConfirmDialog';
 import { useTranslation } from '../../hooks/useTranslation';
 
 const WorkspaceActions: React.FC = () => {
-  const { mode, pdfFile, setPdfFile, setMode, content, setContent, title } = useWorkspace();
+  const { mode, pdfFile, setPdfFile, setMode, content, setContent, title, size } = useWorkspace();
   const t = useTranslation();
   const [confirmDialog, setConfirmDialog] = useState<{
     open: boolean;
@@ -116,6 +117,25 @@ const WorkspaceActions: React.FC = () => {
   const isDownloadDisabled = !hasInteracted || (mode === 'text' && !content) || (mode === 'pdf' && !pdfFile);
   const isDeleteDisabled = (mode === 'text' && !content) || (mode === 'pdf' && !pdfFile);
 
+  // 在PDF模式下不显示操作按钮（已在PDFViewer中显示）
+  if (mode === 'pdf') {
+    return (
+      <>
+        <ConfirmDialog
+          open={confirmDialog.open}
+          title={confirmDialog.title}
+          message={confirmDialog.message}
+          onConfirm={() => {
+            confirmDialog.onConfirm();
+          }}
+          onCancel={() => {
+            setConfirmDialog({ ...confirmDialog, open: false });
+          }}
+        />
+      </>
+    );
+  }
+
   return (
     <>
       <input
@@ -125,22 +145,30 @@ const WorkspaceActions: React.FC = () => {
         onChange={handleFileUpload}
         style={{ display: 'none' }}
       />
+      {/* Action area - fills the fixed action area */}
       <Box
         sx={{
-          position: 'absolute',
-          right: '40px',
-          bottom: '24px',
-          zIndex: 1002,
+          width: '100%',
+          height: '100%',
+          padding: '16px 24px',
+          display: 'flex',
+          justifyContent: 'flex-end',
+          alignItems: 'center',
+          backgroundColor: 'transparent', // 确保没有背景
         }}
       >
-        <Stack direction="row" spacing={1}>
+        <Stack 
+          direction="row" 
+          spacing={1}
+          sx={{ gap: '8px' }}
+        >
           <IconButton
             onClick={handleUploadClick}
             sx={{
               color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
             }}
           >
@@ -151,9 +179,9 @@ const WorkspaceActions: React.FC = () => {
             disabled={isDownloadDisabled}
             sx={{
               color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
               '&:disabled': {
                 opacity: 0.3,
@@ -168,9 +196,9 @@ const WorkspaceActions: React.FC = () => {
             disabled={isDeleteDisabled}
             sx={{
               color: '#ffffff',
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
               '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
               '&:disabled': {
                 opacity: 0.3,

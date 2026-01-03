@@ -2,10 +2,13 @@ import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { WorkspaceSize } from '../utils/constants';
 
 export type WorkspaceMode = 'text' | 'pdf';
+export type WorkspacePosition = 'left' | 'center' | 'right';
 
 interface WorkspaceContextType {
   size: WorkspaceSize;
   setSize: (size: WorkspaceSize) => void;
+  position: WorkspacePosition;
+  setPosition: (position: WorkspacePosition) => void;
   content: string;
   setContent: (content: string) => void;
   title: string;
@@ -32,6 +35,7 @@ interface WorkspaceProviderProps {
 
 export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }) => {
   const [size, setSize] = useState<WorkspaceSize>(WorkspaceSize.SMALL);
+  const [position, setPosition] = useState<WorkspacePosition>('center');
   const [content, setContent] = useState<string>('');
   const [title, setTitle] = useState<string>('标题');
   const [mode, setMode] = useState<WorkspaceMode>('text');
@@ -42,6 +46,8 @@ export const WorkspaceProvider: React.FC<WorkspaceProviderProps> = ({ children }
       value={{
         size,
         setSize,
+        position,
+        setPosition,
         content,
         setContent,
         title,

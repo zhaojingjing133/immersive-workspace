@@ -10,7 +10,15 @@ const TransparencySlider: React.FC = () => {
   return (
     <Box>
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <Typography variant="body2" sx={{ fontSize: '12px', color: '#ffffff' }}>
+        <Typography 
+          variant="body2" 
+          sx={{ 
+            fontSize: '12px', 
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            color: '#ffffff' 
+          }}
+        >
           {t('workspaceSettings')}
         </Typography>
         <Switch

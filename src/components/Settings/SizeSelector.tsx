@@ -1,53 +1,88 @@
 import React from 'react';
-import { Box, ToggleButtonGroup, ToggleButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import { useWorkspace } from '../../context/WorkspaceContext';
 import { WorkspaceSize } from '../../utils/constants';
+import { useTranslation } from '../../hooks/useTranslation';
 
 const SizeSelector: React.FC = () => {
   const { size, setSize } = useWorkspace();
+  const t = useTranslation();
 
-  const handleSizeChange = (
-    _event: React.MouseEvent<HTMLElement>,
-    newSize: WorkspaceSize | null,
-  ) => {
-    if (newSize !== null) {
-      setSize(newSize);
-    }
-  };
+  const sizes = [
+    { value: WorkspaceSize.EXTRA_SMALL, iconSize: 8 },
+    { value: WorkspaceSize.SMALL, iconSize: 12 },
+    { value: WorkspaceSize.MEDIUM, iconSize: 16 },
+    { value: WorkspaceSize.LARGE, iconSize: 20 },
+  ];
+
+  const selectedIndex = sizes.findIndex(s => s.value === size);
 
   return (
     <Box>
-      <Typography variant="body2" sx={{ marginBottom: '16px', fontSize: '12px' }}>
-        工作区尺寸
-      </Typography>
-      <ToggleButtonGroup
-        value={size}
-        exclusive
-        onChange={handleSizeChange}
-        aria-label="workspace size"
-        sx={{
-          width: '100%',
-          '& .MuiToggleButton-root': {
-            flex: 1,
-            color: '#ffffff',
-            borderColor: 'rgba(161, 161, 170, 0.3)',
-            '&.Mui-selected': {
-              backgroundColor: '#ffffff',
-              color: '#222222',
-              '&:hover': {
-                backgroundColor: '#ffffff',
-              },
-            },
-            '&:hover': {
-              backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            },
-          },
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          marginBottom: '16px', 
+          fontSize: '12px', 
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: '#ffffff' 
         }}
       >
-        <ToggleButton value={WorkspaceSize.SMALL}>小</ToggleButton>
-        <ToggleButton value={WorkspaceSize.MEDIUM}>中</ToggleButton>
-        <ToggleButton value={WorkspaceSize.LARGE}>大</ToggleButton>
-      </ToggleButtonGroup>
+        {t('workspaceSize')}
+      </Typography>
+      <Box
+        sx={{
+          position: 'relative',
+          display: 'flex',
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          borderRadius: '9999px',
+          padding: '4px',
+          width: '100%',
+        }}
+      >
+        {/* Sliding highlight */}
+        <Box
+          sx={{
+            position: 'absolute',
+            left: `calc(${selectedIndex * 25}% + 4px)`,
+            width: `calc(25% - 8px)`,
+            height: 'calc(100% - 8px)',
+            backgroundColor: '#ffffff',
+            borderRadius: '9999px',
+            transition: 'left 0.2s ease',
+            zIndex: 1,
+          }}
+        />
+        {/* Icons */}
+        {sizes.map((item) => (
+          <IconButton
+            key={item.value}
+            onClick={() => setSize(item.value)}
+            sx={{
+              position: 'relative',
+              zIndex: 2,
+              flex: 1,
+              minWidth: 0,
+              padding: '8px',
+              color: size === item.value ? '#000000' : 'rgba(255, 255, 255, 0.7)',
+              '&:hover': {
+                color: size === item.value ? '#000000' : '#ffffff',
+                backgroundColor: 'transparent',
+              },
+            }}
+          >
+            <Box
+              sx={{
+                width: `${item.iconSize}px`,
+                height: `${item.iconSize}px`,
+                backgroundColor: 'currentColor',
+                borderRadius: '2px',
+              }}
+            />
+          </IconButton>
+        ))}
+      </Box>
     </Box>
   );
 };

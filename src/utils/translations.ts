@@ -14,9 +14,13 @@ export interface Translations {
   // Music Upload
   backgroundMusicSettings: string;
   uploadMusic: string;
+  uploadMusic1: string;
+  uploadMusic2: string;
   
   // Volume Slider
   volumeSettings: string;
+  volumeSettings1: string;
+  volumeSettings2: string;
   
   // Timer Settings
   timerClose: string;
@@ -33,15 +37,27 @@ export interface Translations {
   cancel: string;
   confirm: string;
   
+  // Notifications
+  timerEnabled: string;
+  timerDisabled: string;
+  uploadSuccess: string;
+  
   // Transparency Slider
   workspaceSettings: string;
   transparency: string;
   
   // Size Selector
   workspaceSize: string;
+  extraSmall: string;
   small: string;
   medium: string;
   large: string;
+  
+  // Position Selector
+  position: string;
+  left: string;
+  center: string;
+  right: string;
   
   // PDF Viewer
   uploadPDFFile: string;
@@ -56,6 +72,12 @@ export interface Translations {
   confirmDeleteContent: string;
   deletePDF: string;
   confirmDeletePDF: string;
+  
+  // Video Audio Controls
+  videoAudio: string;
+  videoAudioMuted: string;
+  videoAudioUnmuted: string;
+  videoVolume: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -66,7 +88,11 @@ export const translations: Record<Language, Translations> = {
     uploadImageVideo: '上传图片/视频',
     backgroundMusicSettings: '背景音乐设置',
     uploadMusic: '上传音乐',
+    uploadMusic1: '上传音乐1',
+    uploadMusic2: '上传音乐2',
     volumeSettings: '音量设置',
+    volumeSettings1: '音量设置1',
+    volumeSettings2: '音量设置2',
     timerClose: '定时关闭',
     notEnabled: '不开启',
     minutes15: '15分钟',
@@ -80,12 +106,20 @@ export const translations: Record<Language, Translations> = {
     minutes: '分钟',
     cancel: '取消',
     confirm: '确定',
+    timerEnabled: '已开启定时关闭',
+    timerDisabled: '已取消定时关闭',
+    uploadSuccess: '上传成功',
     workspaceSettings: '工作台显示',
     transparency: '透明度',
     workspaceSize: '工作区尺寸',
+    extraSmall: '极小',
     small: '小',
     medium: '中',
     large: '大',
+    position: '位置',
+    left: '左',
+    center: '中',
+    right: '右',
     uploadPDFFile: '上传PDF文件',
     useUploadButton: '请使用右下角的上传按钮',
     loading: '加载中...',
@@ -96,6 +130,10 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteContent: '确定要删除所有已写的内容吗？',
     deletePDF: '删除PDF',
     confirmDeletePDF: '确定要删除当前PDF吗？',
+    videoAudio: '视频音频',
+    videoAudioMuted: '静音',
+    videoAudioUnmuted: '取消静音',
+    videoVolume: '视频音量',
   },
   'en': {
     settings: 'Settings',
@@ -104,7 +142,11 @@ export const translations: Record<Language, Translations> = {
     uploadImageVideo: 'Upload Image/Video',
     backgroundMusicSettings: 'Background Music Settings',
     uploadMusic: 'Upload Music',
+    uploadMusic1: 'Upload Music 1',
+    uploadMusic2: 'Upload Music 2',
     volumeSettings: 'Volume Settings',
+    volumeSettings1: 'Volume Settings 1',
+    volumeSettings2: 'Volume Settings 2',
     timerClose: 'Auto Close Timer',
     notEnabled: 'Not Enabled',
     minutes15: '15 Minutes',
@@ -118,12 +160,20 @@ export const translations: Record<Language, Translations> = {
     minutes: 'Minutes',
     cancel: 'Cancel',
     confirm: 'Confirm',
+    timerEnabled: 'Timer enabled',
+    timerDisabled: 'Timer disabled',
+    uploadSuccess: 'Upload successful',
     workspaceSettings: 'Workspace Settings',
     transparency: 'Transparency',
     workspaceSize: 'Workspace Size',
+    extraSmall: 'Extra Small',
     small: 'Small',
     medium: 'Medium',
     large: 'Large',
+    position: 'Position',
+    left: 'Left',
+    center: 'Center',
+    right: 'Right',
     uploadPDFFile: 'Upload PDF File',
     useUploadButton: 'Please use the upload button at the bottom right',
     loading: 'Loading...',
@@ -134,6 +184,10 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteContent: 'Are you sure you want to delete all written content?',
     deletePDF: 'Delete PDF',
     confirmDeletePDF: 'Are you sure you want to delete the current PDF?',
+    videoAudio: 'Video Audio',
+    videoAudioMuted: 'Muted',
+    videoAudioUnmuted: 'Unmuted',
+    videoVolume: 'Video Volume',
   },
   'ru': {
     settings: 'Настройки',
@@ -142,7 +196,11 @@ export const translations: Record<Language, Translations> = {
     uploadImageVideo: 'Загрузить изображение/видео',
     backgroundMusicSettings: 'Настройки фоновой музыки',
     uploadMusic: 'Загрузить музыку',
+    uploadMusic1: 'Загрузить музыку 1',
+    uploadMusic2: 'Загрузить музыку 2',
     volumeSettings: 'Настройки громкости',
+    volumeSettings1: 'Настройки громкости 1',
+    volumeSettings2: 'Настройки громкости 2',
     timerClose: 'Таймер автозакрытия',
     notEnabled: 'Не включено',
     minutes15: '15 минут',
@@ -156,12 +214,20 @@ export const translations: Record<Language, Translations> = {
     minutes: 'Минуты',
     cancel: 'Отмена',
     confirm: 'Подтвердить',
+    timerEnabled: 'Таймер включен',
+    timerDisabled: 'Таймер отключен',
+    uploadSuccess: 'Загрузка успешна',
     workspaceSettings: 'Настройки рабочего пространства',
     transparency: 'Прозрачность',
     workspaceSize: 'Размер рабочего пространства',
+    extraSmall: 'Очень маленький',
     small: 'Маленький',
     medium: 'Средний',
     large: 'Большой',
+    position: 'Позиция',
+    left: 'Слева',
+    center: 'По центру',
+    right: 'Справа',
     uploadPDFFile: 'Загрузить PDF файл',
     useUploadButton: 'Пожалуйста, используйте кнопку загрузки внизу справа',
     loading: 'Загрузка...',
@@ -172,5 +238,9 @@ export const translations: Record<Language, Translations> = {
     confirmDeleteContent: 'Вы уверены, что хотите удалить все написанное содержимое?',
     deletePDF: 'Удалить PDF',
     confirmDeletePDF: 'Вы уверены, что хотите удалить текущий PDF?',
+    videoAudio: 'Аудио видео',
+    videoAudioMuted: 'Без звука',
+    videoAudioUnmuted: 'Со звуком',
+    videoVolume: 'Громкость видео',
   },
 };

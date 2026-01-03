@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { Box, IconButton, Typography, Stack } from '@mui/material';
-import { ChevronLeft, ChevronRight, ZoomIn, ZoomOut } from '@mui/icons-material';
+import { ZoomIn, ZoomOut, CloudUpload, CloudDownload, Delete } from '@mui/icons-material';
 import { useWorkspace } from '../../context/WorkspaceContext';
-import { readFileAsArrayBuffer } from '../../utils/fileHandlers';
+import { WorkspaceSize } from '../../utils/constants';
+import { readFileAsArrayBuffer, isValidPDFFile } from '../../utils/fileHandlers';
 import { useTranslation } from '../../hooks/useTranslation';
+import ConfirmDialog from '../Common/ConfirmDialog';
 import 'react-pdf/dist/esm/Page/AnnotationLayer.css';
 import 'react-pdf/dist/esm/Page/TextLayer.css';
 
@@ -14,12 +16,22 @@ if (typeof window !== 'undefined') {
 }
 
 const PDFViewer: React.FC = () => {
-  const { pdfFile } = useWorkspace();
+  const { pdfFile, size, setPdfFile, setMode } = useWorkspace();
   const t = useTranslation();
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
   const [pdfData, setPdfData] = useState<ArrayBuffer | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{
+    open: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    open: false,
+    title: '',
+    message: '',
+    onConfirm: () => {},
+  });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Load PDF data when pdfFile changes
   useEffect(() => {
@@ -27,7 +39,6 @@ const PDFViewer: React.FC = () => {
       if (pdfFile) {
         const data = await readFileAsArrayBuffer(pdfFile);
         setPdfData(data);
-        setPageNumber(1);
       } else {
         setPdfData(null);
       }
@@ -35,16 +46,8 @@ const PDFViewer: React.FC = () => {
     loadPDF();
   }, [pdfFile]);
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-  };
-
-  const goToPrevPage = () => {
-    setPageNumber((prev) => Math.max(1, prev - 1));
-  };
-
-  const goToNextPage = () => {
-    setPageNumber((prev) => Math.min(numPages, prev + 1));
+  const onDocumentLoadSuccess = () => {
+    // PDF loaded successfully
   };
 
   const zoomIn = () => {
@@ -53,6 +56,64 @@ const PDFViewer: React.FC = () => {
 
   const zoomOut = () => {
     setScale((prev) => Math.max(0.5, prev - 0.2));
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!isValidPDFFile(file)) {
+      alert('请上传有效的PDF文件');
+      return;
+    }
+
+    if (pdfFile) {
+      setConfirmDialog({
+        open: true,
+        title: t('replacePDF'),
+        message: t('newPDFWillReplace'),
+        onConfirm: () => {
+          setPdfFile(file);
+          setConfirmDialog({ ...confirmDialog, open: false });
+        },
+      });
+    } else {
+      setPdfFile(file);
+    }
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleUploadClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleDownload = async () => {
+    if (pdfFile) {
+      const url = URL.createObjectURL(pdfFile);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = pdfFile.name;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    }
+  };
+
+  const handleDelete = () => {
+    setConfirmDialog({
+      open: true,
+      title: t('deletePDF'),
+      message: t('confirmDeletePDF'),
+      onConfirm: () => {
+        setPdfFile(null);
+        setMode('text');
+        setConfirmDialog({ ...confirmDialog, open: false });
+      },
+    });
   };
 
   if (!pdfData) {
@@ -79,24 +140,33 @@ const PDFViewer: React.FC = () => {
   }
 
   return (
-    <Box
-      sx={{
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-      }}
-    >
+    <>
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept=".pdf"
+        onChange={handleFileUpload}
+        style={{ display: 'none' }}
+      />
+      <Box
+        sx={{
+          width: '100%',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+        }}
+      >
       {/* PDF Document */}
       <Box
         sx={{
           flex: 1,
           display: 'flex',
-          justifyContent: 'center',
+          justifyContent: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? 'flex-start' : 'center',
           alignItems: 'flex-start',
           overflow: 'auto',
           padding: '24px',
+          paddingBottom: '24px',
         }}
       >
         <Document
@@ -110,7 +180,7 @@ const PDFViewer: React.FC = () => {
           }
         >
           <Page
-            pageNumber={pageNumber}
+            pageNumber={1}
             scale={scale}
             renderTextLayer={true}
             renderAnnotationLayer={true}
@@ -131,52 +201,20 @@ const PDFViewer: React.FC = () => {
           borderTop: '1px solid rgba(255, 255, 255, 0.1)',
           zIndex: 1001,
           display: 'flex',
-          justifyContent: 'space-between',
+          justifyContent: 'flex-end',
           alignItems: 'center',
         }}
       >
         <Stack
           direction="row"
-          spacing={2}
+          spacing={size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? 0.5 : 1}
           alignItems="center"
         >
-          <IconButton 
-            onClick={goToPrevPage} 
-            disabled={pageNumber <= 1} 
-            sx={{ 
-              color: '#ffffff',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              },
-              '&:disabled': {
-                opacity: 0.5,
-              },
-            }}
-          >
-            <ChevronLeft />
-          </IconButton>
-          <Typography sx={{ color: '#ffffff', minWidth: '60px', textAlign: 'center', fontSize: '14px' }}>
-            {pageNumber} / {numPages}
-          </Typography>
-          <IconButton 
-            onClick={goToNextPage} 
-            disabled={pageNumber >= numPages} 
-            sx={{ 
-              color: '#ffffff',
-              '&:hover': {
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-              },
-              '&:disabled': {
-                opacity: 0.5,
-              },
-            }}
-          >
-            <ChevronRight />
-          </IconButton>
           <IconButton 
             onClick={zoomOut} 
             sx={{ 
               color: '#ffffff',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
               '&:hover': {
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
@@ -188,6 +226,7 @@ const PDFViewer: React.FC = () => {
             onClick={zoomIn} 
             sx={{ 
               color: '#ffffff',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
               '&:hover': {
                 backgroundColor: 'rgba(255, 255, 255, 0.1)',
               },
@@ -195,9 +234,67 @@ const PDFViewer: React.FC = () => {
           >
             <ZoomIn />
           </IconButton>
+          <IconButton
+            onClick={handleUploadClick}
+            sx={{
+              color: '#ffffff',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+            }}
+          >
+            <CloudUpload />
+          </IconButton>
+          <IconButton
+            onClick={handleDownload}
+            disabled={!pdfFile}
+            sx={{
+              color: '#ffffff',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+              '&:disabled': {
+                opacity: 0.3,
+                color: '#ffffff',
+              },
+            }}
+          >
+            <CloudDownload />
+          </IconButton>
+          <IconButton
+            onClick={handleDelete}
+            disabled={!pdfFile}
+            sx={{
+              color: '#ffffff',
+              padding: size === WorkspaceSize.SMALL || size === WorkspaceSize.EXTRA_SMALL ? '8px' : '12px',
+              '&:hover': {
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              },
+              '&:disabled': {
+                opacity: 0.3,
+                color: '#ffffff',
+              },
+            }}
+          >
+            <Delete />
+          </IconButton>
         </Stack>
       </Box>
-    </Box>
+      </Box>
+      <ConfirmDialog
+        open={confirmDialog.open}
+        title={confirmDialog.title}
+        message={confirmDialog.message}
+        onConfirm={() => {
+          confirmDialog.onConfirm();
+        }}
+        onCancel={() => {
+          setConfirmDialog({ ...confirmDialog, open: false });
+        }}
+      />
+    </>
   );
 };
 

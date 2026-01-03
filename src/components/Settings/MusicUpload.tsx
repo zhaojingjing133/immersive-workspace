@@ -1,14 +1,41 @@
-import React, { useRef } from 'react';
-import { Box, Button, Typography, IconButton } from '@mui/material';
+import React, { useRef, useState } from 'react';
+import { Box, Button, Typography, IconButton, Snackbar } from '@mui/material';
 import { CloudUpload, PlayArrow, Pause } from '@mui/icons-material';
 import { useSettings } from '../../context/SettingsContext';
 import { readFileAsDataURL, isValidAudioFile } from '../../utils/fileHandlers';
 import { useTranslation } from '../../hooks/useTranslation';
 
-const MusicUpload: React.FC = () => {
-  const { audioFile, setAudioFile, audioUrl, setAudioUrl, isPlaying, setIsPlaying } = useSettings();
+interface MusicUploadProps {
+  track: 1 | 2;
+}
+
+const MusicUpload: React.FC<MusicUploadProps> = ({ track }) => {
+  const {
+    audioFile,
+    setAudioFile,
+    audioUrl,
+    setAudioUrl,
+    isPlaying,
+    setIsPlaying,
+    audioFile2,
+    setAudioFile2,
+    audioUrl2,
+    setAudioUrl2,
+    isPlaying2,
+    setIsPlaying2,
+  } = useSettings();
   const t = useTranslation();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+
+  // 根据 track 选择对应的状态
+  const currentAudioFile = track === 1 ? audioFile : audioFile2;
+  const currentAudioUrl = track === 1 ? audioUrl : audioUrl2;
+  const currentIsPlaying = track === 1 ? isPlaying : isPlaying2;
+  const setCurrentAudioFile = track === 1 ? setAudioFile : setAudioFile2;
+  const setCurrentAudioUrl = track === 1 ? setAudioUrl : setAudioUrl2;
+  const setCurrentIsPlaying = track === 1 ? setIsPlaying : setIsPlaying2;
+  const uploadLabel = track === 1 ? t('uploadMusic1') : t('uploadMusic2');
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -20,9 +47,10 @@ const MusicUpload: React.FC = () => {
     }
 
     const dataURL = await readFileAsDataURL(file);
-    setAudioFile(file);
-    setAudioUrl(dataURL);
-    setIsPlaying(true);
+    setCurrentAudioFile(file);
+    setCurrentAudioUrl(dataURL);
+    setCurrentIsPlaying(true);
+    setSnackbarOpen(true);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -30,13 +58,22 @@ const MusicUpload: React.FC = () => {
   };
 
   const handlePlayPause = () => {
-    setIsPlaying(!isPlaying);
+    setCurrentIsPlaying(!currentIsPlaying);
   };
 
   return (
     <Box>
-      <Typography variant="body2" sx={{ marginBottom: '16px', fontSize: '12px', color: '#ffffff' }}>
-        {t('backgroundMusicSettings')}
+      <Typography 
+        variant="body2" 
+        sx={{ 
+          marginBottom: '16px', 
+          fontSize: '12px', 
+          textTransform: 'uppercase',
+          letterSpacing: '0.1em',
+          color: '#ffffff' 
+        }}
+      >
+        {uploadLabel}
       </Typography>
       <Box sx={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
         <Button
@@ -53,7 +90,7 @@ const MusicUpload: React.FC = () => {
             },
           }}
         >
-          {t('uploadMusic')}
+          {uploadLabel}
           <input
             ref={fileInputRef}
             type="file"
@@ -62,7 +99,7 @@ const MusicUpload: React.FC = () => {
             style={{ display: 'none' }}
           />
         </Button>
-        {(audioFile || audioUrl) && (
+        {(currentAudioFile || currentAudioUrl) && (
           <IconButton
             onClick={handlePlayPause}
             sx={{
@@ -73,10 +110,24 @@ const MusicUpload: React.FC = () => {
               },
             }}
           >
-            {isPlaying ? <Pause /> : <PlayArrow />}
+            {currentIsPlaying ? <Pause /> : <PlayArrow />}
           </IconButton>
         )}
       </Box>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={2000}
+        onClose={() => setSnackbarOpen(false)}
+        message={t('uploadSuccess')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        ContentProps={{
+          sx: {
+            backgroundColor: 'rgba(34, 34, 34, 0.9)',
+            color: '#ffffff',
+            backdropFilter: 'blur(10px)',
+          },
+        }}
+      />
     </Box>
   );
 };

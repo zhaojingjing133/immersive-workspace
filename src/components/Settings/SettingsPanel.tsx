@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Box, IconButton, Drawer, Divider } from '@mui/material';
 import { Settings as SettingsIcon, Close as CloseIcon } from '@mui/icons-material';
 import SizeSelector from './SizeSelector';
+import PositionSelector from './PositionSelector';
 import BackgroundUpload from './BackgroundUpload';
+import VideoAudioControls from './VideoAudioControls';
 import MusicUpload from './MusicUpload';
 import VolumeSlider from './VolumeSlider';
 import TransparencySlider from './TransparencySlider';
@@ -40,14 +42,23 @@ const SettingsPanel: React.FC = () => {
         PaperProps={{
           sx: {
             width: { xs: '280px', sm: '320px' },
-            backgroundColor: 'rgba(34, 34, 34, 0.95)',
-            backdropFilter: 'blur(20px)',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(24px)',
+            borderLeft: '1px solid rgba(255, 255, 255, 0.1)',
             padding: '24px',
           },
         }}
       >
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-          <Box sx={{ fontSize: '18px', fontWeight: 600, color: '#ffffff' }}>{t('settings')}</Box>
+          <Box sx={{ 
+            fontSize: '12px', 
+            fontWeight: 600, 
+            textTransform: 'uppercase', 
+            letterSpacing: '0.1em', 
+            color: '#ffffff' 
+          }}>
+            {t('settings')}
+          </Box>
           <IconButton
             onClick={() => setOpen(false)}
             sx={{ color: '#ffffff', '&:hover': { backgroundColor: 'rgba(255, 255, 255, 0.1)' } }}
@@ -59,14 +70,18 @@ const SettingsPanel: React.FC = () => {
           <LanguageSelector />
           <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
           <BackgroundUpload />
+          <VideoAudioControls />
           <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
-          <MusicUpload />
-          <VolumeSlider />
+          <MusicUpload track={1} />
+          <VolumeSlider track={1} />
+          <MusicUpload track={2} />
+          <VolumeSlider track={2} />
           <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
           <TimerSettings />
           <Divider sx={{ borderColor: 'rgba(255, 255, 255, 0.1)' }} />
           <TransparencySlider />
           <SizeSelector />
+          <PositionSelector />
         </Box>
       </Drawer>
     </>
